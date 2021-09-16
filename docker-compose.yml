@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  dockerti_node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nodejs
+    container_name: dockerti_node
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_USERNAME=$MONGO_USERNAME
+      - MONGO_PASSWORD=$MONGO_PASSWORD
+      - MONGO_URL=$MONGO_URL
+      - MONGO_PORT=$MONGO_PORT
+      - MONGO_DB=$MONGO_DB
+    ports:
+        - "6000:6000"   
+    networks:
+      - app-network
+
+  dockerti_mongo:
+    container_name: dockerti_mongo
+    restart: unless-stopped
+    image: mongo
+    ports:
+        - "27117:27017"
+    volumes:
+        - dockerti_mongo-data:/data/db
+    networks:
+        - app-network
+
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+
+  
+volumes:
+  dockerti_mongo-data:
+
+networks:
+  app-network:
+    driver: bridge
